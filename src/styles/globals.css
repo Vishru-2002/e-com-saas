@@ -1,0 +1,428 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@config '../../tailwind.config.cjs';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #fbf8ff;
+  --foreground: #1a1b22;
+  --surface: #fbf8ff;
+  --surface-dim: #dad9e3;
+  --surface-bright: #fbf8ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f4f2fd;
+  --surface-container: #eeedf7;
+  --surface-container-high: #e8e7f1;
+  --surface-container-highest: #e3e1ec;
+  --on-surface: #1a1b22;
+  --on-surface-variant: #47464a;
+  --inverse-surface: #2f3038;
+  --inverse-on-surface: #f1effa;
+  --outline: #78767b;
+  --outline-variant: #c8c5ca;
+  --surface-tint: #5f5e60;
+  --primary: #000000;
+  --on-primary: #ffffff;
+  --primary-container: #1c1b1d;
+  --on-primary-container: #858386;
+  --inverse-primary: #c8c6c8;
+  --secondary: #006c49;
+  --on-secondary: #ffffff;
+  --secondary-container: #6cf8bb;
+  --on-secondary-container: #00714d;
+  --tertiary: #000000;
+  --on-tertiary: #ffffff;
+  --tertiary-container: #001d31;
+  --on-tertiary-container: #188ace;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --on-error-container: #93000a;
+  --border: #e4e4e7;
+  --ring: #0284c7;
+  --radius: 0.375rem;
+  --popover: #ffffff;
+  --popover-foreground: #1a1b22;
+  --card: #ffffff;
+  --card-foreground: #1a1b22;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+button, a, select {
+  cursor: pointer;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 1px;
+}
+
+/* ========================================================
+   MODERN MULTI-TENANT ADMIN - ELEVATION & DEPTH SYSTEM
+   ======================================================== */
+
+/* Level 1: Border Surface (Cards, Data Tables, Input Groups) */
+.card,
+.customer-admin table,
+.customer-admin .bg-surface-container-lowest,
+.builder-card {
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Level 2: Raised Dropdown, Flyouts & Action Menus */
+.customer-admin [role="dialog"],
+.app-dialog,
+.dropdown-menu {
+  border: 1px solid #e4e4e7 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+}
+
+/* Level 3: Command Palette & Confirmation Modals */
+.app-dialog {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* Z-Index Layering */
+.z-base { z-index: 1; }
+.z-subnav { z-index: 10; }
+.z-topbar { z-index: 40; }
+.z-drawer { z-index: 50; }
+.z-modal { z-index: 60; }
+.z-toast { z-index: 100; }
+
+/* ========================================================
+   DATA TABLES SPECIFICATION
+   ======================================================== */
+.customer-admin table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.customer-admin table thead th {
+  background-color: #fafafa !important;
+  color: #71717a !important;
+  font-family: Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  border-bottom: 1px solid #e4e4e7;
+  padding: 10px 16px;
+}
+
+.customer-admin table tbody tr {
+  height: 48px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f4f4f5;
+  transition: background-color 0.15s ease;
+}
+
+.customer-admin table tbody tr:hover {
+  background-color: #f9fafb !important;
+}
+
+.customer-admin table tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #1a1b22;
+  border-bottom: 1px solid #f4f4f5;
+  font-variant-numeric: tabular-nums;
+}
+
+.customer-admin table tbody tr:has(input[type="checkbox"]:checked) {
+  background-color: #f0fdf4 !important;
+  box-shadow: inset 2px 0 0 0 #10b981;
+}
+
+/* Tabular figures for financial and code numbers */
+.customer-admin code,
+.customer-admin kbd,
+.code-tabular {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========================================================
+   BADGES & STATUS CHIPS (Pill geometry 9999px)
+   ======================================================== */
+.status-pill,
+.badge-pill {
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.status-active,
+.status-pill:has(.live-dot),
+.status-pill.status-active {
+  background-color: #ecfdf5 !important;
+  color: #059669 !important;
+}
+
+.status-active::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+}
+
+.status-pending {
+  background-color: #fffbeb !important;
+  color: #d97706 !important;
+}
+
+.status-pending::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #f59e0b;
+}
+
+.status-draft {
+  background-color: #f4f4f5 !important;
+  color: #71717a !important;
+}
+
+/* ========================================================
+   INPUTS & SEARCH
+   ======================================================== */
+.customer-admin input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+.customer-admin select,
+.customer-admin textarea,
+.app-dialog input,
+.app-dialog select,
+.app-dialog textarea {
+  background-color: #ffffff;
+  border: 1px solid #e4e4e7;
+  color: #09090b;
+  border-radius: 0.375rem;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.customer-admin textarea,
+.app-dialog textarea {
+  height: auto;
+  padding: 8px 12px;
+}
+
+.customer-admin input:focus,
+.customer-admin select:focus,
+.customer-admin textarea:focus,
+.app-dialog input:focus,
+.app-dialog select:focus,
+.app-dialog textarea:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 2px #0284c7, 0 0 0 3px #ffffff;
+}
+
+/* ========================================================
+   BUTTONS
+   ======================================================== */
+.seller-primary,
+.primary-action {
+  background-color: #006c49 !important;
+  border: 1px solid #006c49 !important;
+  color: #ffffff !important;
+  border-radius: 0.375rem;
+  height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s;
+}
+
+.seller-primary:hover,
+.primary-action:hover {
+  background-color: #00563a !important;
+  border-color: #00563a !important;
+}
+
+.seller-secondary {
+  background-color: #ffffff !important;
+  border: 1px solid #e4e4e7 !important;
+  color: #18181b !important;
+  border-radius: 0.375rem;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.15s;
+}
+
+.seller-secondary:hover {
+  background-color: #f4f4f5 !important;
+}
+
+/* Toast */
+.app-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: #09090b;
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  font-size: 13px;
+  border: 1px solid #27272a;
+}
+
+/* Container width & alignment rules */
+.customer-admin {
+  width: 100%;
+}
+
+/* Unify global header and screen sub-navigation */
+.customer-admin header {
+  top: 3.5rem !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  z-index: 10 !important;
+}
+
+.customer-admin header > div:first-child {
+  display: none !important;
+}
+
+.customer-admin header > div:nth-child(2) {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e4e4e7 !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+.customer-admin header > div:nth-child(2) > div {
+  max-width: 1560px !important;
+  width: 100% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(16px, 2vw, 32px);
+  padding-right: clamp(16px, 2vw, 32px);
+}
+
+.customer-admin main > div {
+  max-width: 1560px !important;
+  width: 100% !important;
+  padding-left: clamp(16px, 2vw, 32px) !important;
+  padding-right: clamp(16px, 2vw, 32px) !important;
+}
+
+.customer-admin footer > div {
+  max-width: 1560px !important;
+  width: 100% !important;
+  padding-left: clamp(16px, 2vw, 32px) !important;
+  padding-right: clamp(16px, 2vw, 32px) !important;
+}
+
+tr[data-hidden='true'] {
+  display: none !important;
+}
+
+@media print {
+  header, footer, button, .mobile-navigation, .fixed {
+    display: none !important;
+  }
+  main {
+    padding-top: 0 !important;
+  }
+}
