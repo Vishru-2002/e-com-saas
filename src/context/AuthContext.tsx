@@ -1,4 +1,5 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Seller } from '@/types/store';
 import { storageService } from '@/services/storageService';
 
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [seller, setSeller] = useState<Seller | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const refresh = () => {
     setSeller(storageService.getCurrentSeller());
@@ -39,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     storageService.logout();
     setSeller(null);
+    navigate('/', { replace: true });
   };
 
   return (

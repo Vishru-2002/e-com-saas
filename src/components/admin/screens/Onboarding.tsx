@@ -254,10 +254,10 @@ export default function Onboarding() {
                   <div className="w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 mt-0.5">
                     <span className="material-symbols-outlined text-[14px]">{"check"}</span>
                   </div>
-                  <div className="min-w-0">
+                  {/* <div className="min-w-0">
                     <span className="font-body-sm text-body-sm text-on-surface line-through opacity-75">{"Create account & tenant workspace"}</span>
                     <p className="font-label-sm text-label-sm text-on-surface-variant">{"Allocated to US-East-1 AWS cluster"}</p>
-                  </div>
+                  </div> */}
                 </li>
 
                 <li className="flex items-start gap-space-sm">

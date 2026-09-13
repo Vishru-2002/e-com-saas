@@ -3,10 +3,22 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation, Navigate } from
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { StoreProvider, useStore } from '@/context/StoreContext';
 import { Toast } from '@/components/common/Toast';
-import { AdminWorkspacePage } from '@/pages/AdminWorkspacePage';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { LandingPage } from '@/pages/LandingPage';
 import { SellerSetupPage } from '@/pages/SellerSetupPage';
 import { StorefrontPage } from '@/pages/StorefrontPage';
 import { AuthPage } from '@/pages/AuthPage';
+import { OverviewPage } from '@/pages/admin/OverviewPage';
+import { OrdersPage } from '@/pages/admin/OrdersPage';
+import { OrderDetailPage } from '@/pages/admin/OrderDetailPage';
+import { ProductsPage } from '@/pages/admin/ProductsPage';
+import { ProductEditorPage } from '@/pages/admin/ProductEditorPage';
+import { InventoryPage } from '@/pages/admin/InventoryPage';
+import { CustomersPage } from '@/pages/admin/CustomersPage';
+import { CategoriesPage } from '@/pages/admin/CategoriesPage';
+import { SettingsPage } from '@/pages/admin/SettingsPage';
+import { TeamBillingPage } from '@/pages/admin/TeamBillingPage';
+import { OnboardingPage } from '@/pages/admin/OnboardingPage';
 
 function AppContent() {
   const { seller, loading } = useAuth();
@@ -22,78 +34,54 @@ function AppContent() {
     );
   }
 
-  const isStorefrontRoute = location.pathname.startsWith('/store/');
-  const isAuthRoute =
-    location.pathname === '/signin' ||
-    location.pathname === '/signup' ||
-    location.pathname === '/login';
   const isPublished = Boolean(store?.published_at && store?.published);
 
-  // If already authenticated and visiting /signin or /signup, redirect to builder or admin
-  if (seller && isAuthRoute) {
-    return <Navigate to={isPublished ? '/' : '/builder'} replace />;
-  }
-
-  // 1. If not authenticated and not viewing a public storefront, show official Auth page
-  if (!seller && !isStorefrontRoute) {
-    return (
-      <>
-        <AuthPage
-          initialMode={location.pathname === '/signup' ? 'signup' : 'signin'}
-          onSuccess={() => navigate(isPublished ? '/' : '/builder')}
-        />
-        <Toast message={toast} />
-      </>
-    );
-  }
-
-  // 2. Strict flow gating:
-  // Unless and until they fill and submit everything on YOUR STORE, YOUR WAY
-  // Make your next move. NEVER show the store admin.
-  // If the store is NOT published, only allow:
-  // - Store builder (/builder or /)
-  // - Storefront route (/store/:slug)
-  // Any attempt to view admin dashboard screens will remain on SellerSetupPage.
   return (
     <>
       <Routes>
-        {/* Auth routes */}
+        {/* Landing Page: Website on initial / route */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Auth routes: /signin and /signup */}
         <Route
           path="/signin"
           element={
-            <AuthPage
-              initialMode="signin"
-              onSuccess={() => navigate(isPublished ? '/' : '/builder')}
-            />
+            seller ? (
+              <Navigate to={isPublished ? '/overview' : '/builder'} replace />
+            ) : (
+              <AuthPage
+                initialMode="signin"
+                onSuccess={() => navigate(isPublished ? '/overview' : '/builder')}
+              />
+            )
           }
         />
         <Route
           path="/login"
           element={
-            <AuthPage
-              initialMode="signin"
-              onSuccess={() => navigate(isPublished ? '/' : '/builder')}
-            />
+            <Navigate to={seller ? (isPublished ? '/overview' : '/builder') : '/signin'} replace />
           }
         />
         <Route
           path="/signup"
           element={
-            <AuthPage
-              initialMode="signup"
-              onSuccess={() => navigate('/builder')}
-            />
+            seller ? (
+              <Navigate to={isPublished ? '/overview' : '/builder'} replace />
+            ) : (
+              <AuthPage
+                initialMode="signup"
+                onSuccess={() => navigate('/builder')}
+              />
+            )
           }
         />
 
-        {/* Root: if published -> Admin Overview, if not published -> Seller Setup */}
+        {/* Store Setup Builder */}
         <Route
-          path="/"
+          path="/builder"
           element={
-            isPublished ? (
-              <AdminWorkspacePage
-                onNavigateStorefront={(slug) => navigate(`/store/${slug}`)}
-              />
+            !seller ? (
+              <Navigate to="/" replace />
             ) : (
               <SellerSetupPage
                 onNavigateScreen={(screen) => {
@@ -105,44 +93,51 @@ function AppContent() {
           }
         />
 
-        {/* Store Setup Builder */}
-        <Route
-          path="/builder"
-          element={
-            <SellerSetupPage
-              onNavigateScreen={(screen) => {
-                if (isPublished) navigate(`/${screen}`);
-              }}
-              onNavigateStorefront={(slug) => navigate(`/store/${slug}`)}
-            />
-          }
-        />
-
         {/* Live Storefront Page */}
         <Route path="/store/:slug" element={<StorefrontPage />} />
 
-        {/* Dynamic Admin Workspace Screens (e.g. /orders, /products, /settings, /inventory, /customers, etc.) */}
-        <Route
-          path="/:screen"
-          element={
-            isPublished ? (
-              <AdminWorkspacePage
-                onNavigateStorefront={(slug) => navigate(`/store/${slug}`)}
-              />
-            ) : (
-              <Navigate to="/builder" replace />
-            )
-          }
-        />
+        {/* Dedicated Admin Workspace Page Routes */}
+        <Route path="/overview" element={<OverviewPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/order-detail" element={<OrderDetailPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/product-editor" element={<ProductEditorPage />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/team" element={<TeamBillingPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+
+        {/* Sub-navigation & Alias Routes explicitly mapped to pages */}
+        <Route path="/all-products" element={<Navigate to="/products" replace />} />
+        <Route path="/all-orders" element={<Navigate to="/orders" replace />} />
+        <Route path="/unfulfilled" element={<OrdersPage initialFilter="unfulfilled" />} />
+        <Route path="/drafts" element={<OrdersPage initialFilter="drafts" />} />
+        <Route path="/abandoned-carts" element={<OrdersPage initialFilter="abandoned" />} />
+        <Route path="/returns-ndr" element={<OrdersPage initialFilter="exception" />} />
+        <Route path="/variants" element={<Navigate to="/product-editor" replace />} />
+        <Route path="/imports" element={<Navigate to="/products" replace />} />
+        <Route path="/bulk-imports" element={<Navigate to="/products" replace />} />
+        <Route path="/overview-performance" element={<Navigate to="/overview" replace />} />
+        <Route path="/overview-live-activity" element={<Navigate to="/overview" replace />} />
+        <Route path="/overview-analytics" element={<Navigate to="/overview" replace />} />
+        <Route path="/overview-reports" element={<Navigate to="/overview" replace />} />
+        <Route path="/analytics" element={<Navigate to="/overview" replace />} />
+        <Route path="/settings-general" element={<Navigate to="/settings" replace />} />
+        <Route path="/settings-domains-dns" element={<Navigate to="/settings" replace />} />
+        <Route path="/settings-team-permissions" element={<Navigate to="/team" replace />} />
+        <Route path="/settings-billing-plans" element={<Navigate to="/team" replace />} />
+        <Route path="/settings-api-webhooks" element={<Navigate to="/settings" replace />} />
 
         {/* Fallback route */}
         <Route
           path="*"
           element={
-            isPublished ? (
-              <AdminWorkspacePage
-                onNavigateStorefront={(slug) => navigate(`/store/${slug}`)}
-              />
+            !seller ? (
+              <Navigate to="/" replace />
+            ) : isPublished ? (
+              <Navigate to="/overview" replace />
             ) : (
               <Navigate to="/builder" replace />
             )
@@ -157,13 +152,15 @@ function AppContent() {
 
 export function App() {
   return (
-    <AuthProvider>
-      <StoreProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </StoreProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <StoreProvider>
+            <AppContent />
+          </StoreProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

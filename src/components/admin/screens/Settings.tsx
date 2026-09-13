@@ -14,8 +14,6 @@ export default function Settings() {
             <span className="text-on-surface font-semibold">{"General & Domains"}</span>
           </nav>
           <div className="flex items-center gap-space-xs text-on-surface-variant font-code-tabular text-code-tabular bg-surface-container-high px-space-sm py-space-2xs rounded">
-            <span className="w-2 h-2 rounded-full bg-secondary"></span>
-            <span >{"Cluster: AP-SOUTH-1 (Mumbai)"}</span>
           </div>
         </div>
 

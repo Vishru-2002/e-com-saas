@@ -1,46 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useStore } from '@/context/StoreContext';
 import { storageService } from '@/services/storageService';
 import type { ActionModalState } from '@/types/admin';
-
-// Admin screens
-import Overview from '@/pages/screens/Overview';
-import Orders from '@/pages/screens/Orders';
-import OrderDetail from '@/pages/screens/OrderDetail';
-import Products from '@/pages/screens/Products';
-import ProductEditor from '@/pages/screens/ProductEditor';
-import Inventory from '@/pages/screens/Inventory';
-import Customers from '@/pages/screens/Customers';
-import Categories from '@/pages/screens/Categories';
-import Settings from '@/pages/screens/Settings';
-import TeamBilling from '@/pages/screens/TeamBilling';
-import SignIn from '@/pages/screens/SignIn';
-import Onboarding from '@/pages/screens/Onboarding';
-
-// Components
-import { SellerSetupPage } from '@/pages/SellerSetupPage';
 import { AdminHeader } from '@/components/common/AdminHeader';
 import { AdminFooter } from '@/components/common/AdminFooter';
 import { ActionDialog } from '@/components/common/ActionDialog';
-import { QuickMenu } from '@/components/common/QuickMenu';
-
-const screenComponents: Record<string, React.ComponentType> = {
-  seller: SellerSetupPage as unknown as React.ComponentType,
-  overview: Overview,
-  orders: Orders,
-  'order-detail': OrderDetail,
-  products: Products,
-  'product-editor': ProductEditor,
-  inventory: Inventory,
-  customers: Customers,
-  categories: Categories,
-  settings: Settings,
-  team: TeamBilling,
-  'sign-in': SignIn,
-  onboarding: Onboarding,
-};
 
 const routeMap: Record<string, string> = {
   'all-products': 'products',
@@ -64,25 +30,37 @@ const routeMap: Record<string, string> = {
   'returns-ndr': 'orders',
 };
 
-interface AdminWorkspacePageProps {
-  initialRoute?: string;
-  onNavigateStorefront: (slug: string) => void;
+export interface AdminLayoutProps {
+  screen: string;
+  children: React.ReactNode;
+  initialFilter?: string;
+  onNavigateStorefront?: (slug: string) => void;
 }
 
-export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
-  initialRoute = 'overview',
+export const AdminLayout: React.FC<AdminLayoutProps> = ({
+  screen,
+  children,
+  initialFilter,
   onNavigateStorefront,
 }) => {
-  const { screen } = useParams<{ screen?: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { seller } = useAuth();
-  const { showToast } = useStore();
+  const { seller, logout } = useAuth();
+  const { store, showToast } = useStore();
 
-  const currentRoute = (screen ? routeMap[screen] || screen : initialRoute) || 'overview';
   const [modal, setModal] = useState<ActionModalState | null>(null);
   const [revision, setRevision] = useState(0);
   const surfaceRef = useRef<HTMLDivElement>(null);
+
+  // Authentication and store published protection
+  const isPublished = Boolean(store?.published_at && store?.published);
+
+  if (!seller) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isPublished) {
+    return <Navigate to="/builder" replace />;
+  }
 
   const navigateTo = (r: string) => {
     const mapped = routeMap[r] || r;
@@ -90,7 +68,11 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
       navigate('/builder');
     } else if (mapped.startsWith('store/')) {
       const slug = mapped.replace('store/', '');
-      onNavigateStorefront(slug);
+      if (onNavigateStorefront) {
+        onNavigateStorefront(slug);
+      } else {
+        navigate(`/store/${slug}`);
+      }
     } else {
       navigate('/' + mapped);
     }
@@ -111,25 +93,9 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
       value: el.value,
       checked: (el as HTMLInputElement).checked,
     }));
-    storageService.saveScreenData(currentRoute, data);
+    storageService.saveScreenData(screen, data);
     showToast('Changes saved in this browser.');
   };
-
-  useEffect(() => {
-    try {
-      const saved = storageService.getScreenData(currentRoute) as
-        | { value: string; checked: boolean }[]
-        | null;
-      if (saved) {
-        getFields().forEach((el, i) => {
-          if (saved[i]) {
-            el.value = saved[i].value;
-            if (el instanceof HTMLInputElement) el.checked = saved[i].checked;
-          }
-        });
-      }
-    } catch {}
-  }, [currentRoute, revision]);
 
   // Live filter table rows
   const filterTable = (query: string) => {
@@ -167,11 +133,38 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${currentRoute}-export.csv`;
+    a.download = `${screen}-export.csv`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Export downloaded.');
   };
+
+  // Apply initial filter if provided
+  useEffect(() => {
+    if (initialFilter) {
+      const timer = setTimeout(() => {
+        filterTable(initialFilter);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [initialFilter, screen]);
+
+  // Restore saved form data
+  useEffect(() => {
+    try {
+      const saved = storageService.getScreenData(screen) as
+        | { value: string; checked: boolean }[]
+        | null;
+      if (saved) {
+        getFields().forEach((el, i) => {
+          if (saved[i]) {
+            el.value = saved[i].value;
+            if (el instanceof HTMLInputElement) el.checked = saved[i].checked;
+          }
+        });
+      }
+    } catch {}
+  }, [screen, revision]);
 
   // Click interceptor for buttons and navigation links across sample screen markup
   const handleSurfaceClick = (e: React.MouseEvent) => {
@@ -213,7 +206,8 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
         return;
       }
       if (/sign.?out/i.test(label)) {
-        navigateTo('sign-in');
+        logout();
+        navigate('/');
         return;
       }
       if (/forgot/i.test(label)) {
@@ -232,7 +226,7 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
 
     if (!button) {
       const row = target.closest('tbody tr');
-      if (row && !target.closest('input,select,textarea') && currentRoute === 'products') {
+      if (row && !target.closest('input,select,textarea') && screen === 'products') {
         navigateTo('product-editor');
       }
       return;
@@ -306,13 +300,13 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
       return;
     }
 
-    if (/Add Product|Edit items/.test(label) || (icon === 'edit' && currentRoute === 'products')) {
+    if (/Add Product|Edit items/.test(label) || (icon === 'edit' && screen === 'products')) {
       navigateTo('product-editor');
       return;
     }
 
     if (/Fulfill Items|Fulfill Order/.test(label)) {
-      if (currentRoute === 'orders') {
+      if (screen === 'orders') {
         navigateTo('order-detail');
         return;
       }
@@ -320,7 +314,7 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
         title: 'Fulfill order #GB-8924',
         fields: ['Carrier', 'Tracking number'],
         action: 'Mark fulfilled',
-        run: (data) => {
+        run: () => {
           surfaceRef.current?.querySelectorAll('span').forEach((s) => {
             if (s.textContent?.trim() === 'Requires Packing') s.textContent = 'Fulfilled';
           });
@@ -341,7 +335,7 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
       return;
     }
 
-    if (/Details|Track AWB|Verify COD|View Logs/.test(label) && currentRoute === 'orders') {
+    if (/Details|Track AWB|Verify COD|View Logs/.test(label) && screen === 'orders') {
       navigateTo('order-detail');
       return;
     }
@@ -358,16 +352,6 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
     if (icon === 'visibility') {
       const input = button.parentElement?.querySelector<HTMLInputElement>('input');
       if (input) input.type = input.type === 'password' ? 'text' : 'password';
-      return;
-    }
-
-    if (label === 'Sign In' || label === 'Create an Account') {
-      const signup = label === 'Create an Account';
-      document.getElementById('panel-signin')?.classList.toggle('hidden', signup);
-      document.getElementById('panel-signup')?.classList.toggle('hidden', !signup);
-      button.parentElement
-        ?.querySelectorAll('button')
-        .forEach((b) => b.classList.toggle('bg-surface-container-lowest', b === button));
       return;
     }
 
@@ -448,22 +432,10 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
     });
   };
 
-  // If user selected seller builder
-  if (currentRoute === 'seller') {
-    return (
-      <SellerSetupPage
-        onNavigateScreen={navigateTo}
-        onNavigateStorefront={onNavigateStorefront}
-      />
-    );
-  }
-
-  const ActiveScreen = screenComponents[currentRoute] || Overview;
-
   return (
     <>
       <AdminHeader
-        currentScreen={currentRoute}
+        currentScreen={screen}
         onNavigate={navigateTo}
         onSearch={(q) => filterTable(q)}
         onOpenNew={() =>
@@ -513,41 +485,35 @@ export const AdminWorkspacePage: React.FC<AdminWorkspacePageProps> = ({
         }}
         onSubmit={(e) => {
           e.preventDefault();
-          if (currentRoute === 'sign-in') {
-            navigateTo(
-              document.getElementById('panel-signin')?.classList.contains('hidden')
-                ? 'onboarding'
-                : 'overview'
-            );
-          } else {
-            saveFormData();
-          }
+          saveFormData();
         }}
       >
-        <ActiveScreen key={currentRoute + revision} />
+        <div key={screen + revision}>
+          {children}
+        </div>
       </div>
 
       <AdminFooter onNavigate={navigateTo} />
 
-      <QuickMenu
-        onOpenModal={() =>
-          setModal({
-            title: 'My Store Workspace',
-            body: 'Quick jump to any store screen or management tool:',
-            fields: ['Screen'],
-            action: 'Open Screen',
-            run: (d) => navigateTo(d.Screen),
-          })
-        }
-      />
-
       <ActionDialog
         modal={modal}
         onClose={() => setModal(null)}
-        availableScreens={Object.keys(screenComponents)}
+        availableScreens={[
+          'overview',
+          'orders',
+          'order-detail',
+          'products',
+          'product-editor',
+          'inventory',
+          'customers',
+          'categories',
+          'settings',
+          'team',
+          'onboarding',
+        ]}
       />
     </>
   );
 };
 
-export default AdminWorkspacePage;
+export default AdminLayout;

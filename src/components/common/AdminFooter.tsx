@@ -17,14 +17,11 @@ export const AdminFooter: React.FC<AdminFooterProps> = ({ onNavigate }) => {
           </span>
           <span className="text-[#e4e4e7]">|</span>
           <span>Multi-Tenant Commerce Cloud</span>
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] text-[10px] font-bold tracking-wider uppercase border border-[#a7f3d0]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
-            US-EAST · All Systems Normal
-          </span>
+
         </div>
 
         <div className="flex flex-wrap items-center gap-5 sm:gap-6 font-medium">
-          <button
+          {/* <button
             type="button"
             onClick={() => onNavigate?.('overview')}
             className="hover:text-[#1a1b22] transition-colors"
@@ -65,7 +62,7 @@ export const AdminFooter: React.FC<AdminFooterProps> = ({ onNavigate }) => {
             className="hover:text-[#1a1b22] transition-colors"
           >
             Settings
-          </button>
+          </button> */}
         </div>
 
         <div className="text-[11px] text-[#a1a1aa]">

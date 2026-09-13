@@ -18,7 +18,7 @@ export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
 }) => {
   return (
     <header className="seller-header">
-      <a href="/" className="seller-brand">
+      <a href={store?.published_at ? "/overview" : "/builder"} className="seller-brand">
         <span className="brand-mark">
           g<span>›</span>
         </span>{' '}

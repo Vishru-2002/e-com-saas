@@ -145,6 +145,7 @@ class StorageService {
 
   logout(): void {
     localStorage.removeItem(KEYS.SELLER);
+    localStorage.removeItem(KEYS.STORE);
   }
 
   resetAll(): void {
@@ -284,6 +285,9 @@ class StorageService {
       const published = JSON.parse(localStorage.getItem(KEYS.PUBLISHED_STORES) || '{}');
       if (published[slug]) {
         return published[slug];
+      }
+      if (slug === 'the-everyday-studio' || slug === 'demo') {
+        return initialEmptyDraft;
       }
     } catch {}
     return null;

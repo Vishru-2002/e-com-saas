@@ -111,6 +111,25 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
 }) => {
   const { seller, logout } = useAuth();
   const { store } = useStore();
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+  const profileMenuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsProfileOpen(false);
+    logout();
+  };
 
   // Find matching sub-nav config
   const subNavConfig =
@@ -155,10 +174,10 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
               <span className="font-semibold text-xs text-white tracking-tight max-w-[140px] sm:max-w-[200px] truncate">
                 {store?.name || 'Genbytez Store'}
               </span>
-              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] text-[10px] font-bold tracking-wider uppercase">
+              {/* <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] text-[10px] font-bold tracking-wider uppercase">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
                 US-EAST
-              </span>
+              </span> */}
               <span className="material-symbols-outlined text-[#71717a] text-[16px]">
                 unfold_more
               </span>
@@ -250,26 +269,79 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
           </button>
 
           {/* User Profile Avatar & Sign Out */}
-          <div className="flex items-center gap-2">
-            <div
-              onClick={() => onNavigate('settings')}
-              className="relative flex items-center cursor-pointer"
-              title={`${seller?.name || 'Seller'} · Click for Settings`}
+          <div className="relative flex items-center gap-2" ref={profileMenuRef}>
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="relative flex items-center p-0.5 rounded-full hover:ring-2 hover:ring-[#3f3f46] transition-all cursor-pointer"
+              type="button"
+              aria-expanded={isProfileOpen}
+              title={`${seller?.name || 'Seller'} · Click for Account Menu`}
             >
               <div className="w-8 h-8 rounded-full bg-[#27272a] text-white border border-[#3f3f46] flex items-center justify-center font-bold text-xs">
                 {seller?.name ? seller.name.charAt(0).toUpperCase() : 'S'}
               </div>
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#10b981] ring-2 ring-[#09090b]"></span>
-            </div>
+            </button>
 
             <button
-              onClick={logout}
-              className="p-1.5 rounded-md hover:bg-[#18181b] text-[#71717a] hover:text-[#ef4444] transition-colors"
+              onClick={handleLogout}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md hover:bg-[#18181b] text-[#a1a1aa] hover:text-[#ef4444] transition-colors border border-transparent hover:border-[#27272a] cursor-pointer"
               type="button"
               title="Sign out of Genbytez"
             >
               <span className="material-symbols-outlined text-[18px]">logout</span>
+              <span className="text-xs font-medium hidden xl:inline">Sign out</span>
             </button>
+
+            {/* Account Profile Dropdown Menu */}
+            {isProfileOpen && (
+              <div className="absolute right-0 top-11 w-64 rounded-xl bg-[#18181b] border border-[#27272a] shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 text-xs">
+                <div className="px-4 py-2.5 border-b border-[#27272a]">
+                  <p className="font-semibold text-white truncate">{seller?.name || 'Merchant Admin'}</p>
+                  <p className="text-[#a1a1aa] text-[11px] truncate mt-0.5">{seller?.email || 'sarah@genbytez.com'}</p>
+                  <span className="inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full bg-[#006c49]/20 text-[#6cf8bb] text-[10px] font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+                    Store Admin
+                  </span>
+                </div>
+
+                <div className="py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      onNavigate('settings');
+                    }}
+                    className="w-full px-4 py-2 text-left text-[#e4e4e7] hover:text-white hover:bg-[#27272a] flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#a1a1aa]">settings</span>
+                    <span>Store Settings</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      onNavigate('seller');
+                    }}
+                    className="w-full px-4 py-2 text-left text-[#e4e4e7] hover:text-white hover:bg-[#27272a] flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#a1a1aa]">palette</span>
+                    <span>Store Builder</span>
+                  </button>
+                </div>
+
+                <div className="pt-1 mt-1 border-t border-[#27272a]">
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-left text-[#f87171] hover:text-[#ef4444] hover:bg-[#ef4444]/10 flex items-center gap-2.5 transition-colors font-medium cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">logout</span>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -210,7 +210,16 @@ export const SellerSetupPage: React.FC<SellerSetupPageProps> = ({
         <div className="max-w-[1560px] mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-space-md">
           {/* Brand Mark */}
           <div className="flex items-center gap-space-sm">
-            <a href="/" className="flex items-center gap-2 text-on-surface font-semibold text-base font-headline-sm">
+            <a
+              href={isPublished ? "/overview" : "/builder"}
+              onClick={(e) => {
+                if (isPublished) {
+                  e.preventDefault();
+                  onNavigateScreen('overview');
+                }
+              }}
+              className="flex items-center gap-2 text-on-surface font-semibold text-base font-headline-sm"
+            >
               <span className="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-bold text-sm shadow-sm">
                 g›
               </span>
@@ -255,7 +264,10 @@ export const SellerSetupPage: React.FC<SellerSetupPageProps> = ({
                 </div>
                 <button
                   type="button"
-                  onClick={logout}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    logout();
+                  }}
                   className="text-xs text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer"
                 >
                   Sign out
@@ -1212,9 +1224,6 @@ export const SellerSetupPage: React.FC<SellerSetupPageProps> = ({
                       <span className="font-body-sm text-body-sm text-on-surface line-through opacity-75">
                         Create account & tenant workspace
                       </span>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant">
-                        Allocated to US-East-1 AWS cluster
-                      </p>
                     </div>
                   </li>
 

@@ -23,7 +23,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   useEffect(() => {
     if (location.pathname === '/signup') {
       setIsSignUp(true);
-    } else if (location.pathname === '/signin' || location.pathname === '/login') {
+    } else if (location.pathname === '/signin' || location.pathname === '/login' || location.pathname === '/') {
       setIsSignUp(false);
     }
   }, [location.pathname]);
@@ -169,12 +169,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-space-md text-xs">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-low text-secondary font-label-sm text-label-sm border border-surface-container-highest">
-              <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
-              <span>Cluster 01-US · Online</span>
-            </span>
-          </div>
+
         </div>
       </header>
 
@@ -229,6 +224,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   onClick={() => {
                     setIsSignUp(false);
                     setError('');
+                    if (location.pathname !== '/') navigate('/');
                   }}
                   className={`w-full py-space-xs px-space-md rounded font-label-md text-label-md transition-all cursor-pointer ${
                     !isSignUp
@@ -243,6 +239,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   onClick={() => {
                     setIsSignUp(true);
                     setError('');
+                    if (location.pathname !== '/signup') navigate('/signup');
                   }}
                   className={`w-full py-space-xs px-space-md rounded font-label-md text-label-md transition-all cursor-pointer ${
                     isSignUp

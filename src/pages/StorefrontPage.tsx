@@ -102,7 +102,7 @@ export const StorefrontPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/overview')}
                 className="px-4 py-1.5 rounded-lg bg-[#006c49] hover:bg-[#00563a] text-xs font-semibold text-white transition-colors shadow-xs flex items-center gap-1.5"
               >
                 <span>Go to Store Admin Dashboard</span>
