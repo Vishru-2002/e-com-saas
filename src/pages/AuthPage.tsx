@@ -16,17 +16,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine active tab based on prop or route
-  const isSignupRoute = initialMode === 'signup' || location.pathname === '/signup';
-  const [isSignUp, setIsSignUp] = useState(isSignupRoute);
+  // Determine active tab based on in-memory navigation state or initialMode (no query params in URL)
+  const locationState = location.state as { mode?: string } | null;
+  const initialIsSignUp = initialMode === 'signup' || locationState?.mode === 'signup';
+  const [isSignUp, setIsSignUp] = useState(initialIsSignUp);
 
   useEffect(() => {
-    if (location.pathname === '/signup') {
+    if (locationState?.mode === 'signup') {
       setIsSignUp(true);
-    } else if (location.pathname === '/signin' || location.pathname === '/login' || location.pathname === '/') {
+    } else if (locationState?.mode === 'signin') {
       setIsSignUp(false);
     }
-  }, [location.pathname]);
+  }, [location.state]);
 
   // Form Fields
   const [name, setName] = useState('');
@@ -224,7 +225,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   onClick={() => {
                     setIsSignUp(false);
                     setError('');
-                    if (location.pathname !== '/') navigate('/');
                   }}
                   className={`w-full py-space-xs px-space-md rounded font-label-md text-label-md transition-all cursor-pointer ${
                     !isSignUp
@@ -239,7 +239,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                   onClick={() => {
                     setIsSignUp(true);
                     setError('');
-                    if (location.pathname !== '/signup') navigate('/signup');
                   }}
                   className={`w-full py-space-xs px-space-md rounded font-label-md text-label-md transition-all cursor-pointer ${
                     isSignUp

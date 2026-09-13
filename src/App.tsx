@@ -42,39 +42,24 @@ function AppContent() {
         {/* Landing Page: Website on initial / route */}
         <Route path="/" element={<LandingPage />} />
 
-        {/* Auth routes: /signin and /signup */}
+        {/* Single Unified Auth Route */}
         <Route
-          path="/signin"
+          path="/auth"
           element={
             seller ? (
               <Navigate to={isPublished ? '/overview' : '/builder'} replace />
             ) : (
               <AuthPage
-                initialMode="signin"
                 onSuccess={() => navigate(isPublished ? '/overview' : '/builder')}
               />
             )
           }
         />
-        <Route
-          path="/login"
-          element={
-            <Navigate to={seller ? (isPublished ? '/overview' : '/builder') : '/signin'} replace />
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            seller ? (
-              <Navigate to={isPublished ? '/overview' : '/builder'} replace />
-            ) : (
-              <AuthPage
-                initialMode="signup"
-                onSuccess={() => navigate('/builder')}
-              />
-            )
-          }
-        />
+
+        {/* Backward Compatibility Redirects to clean /auth route */}
+        <Route path="/signin" element={<Navigate to="/auth" replace />} />
+        <Route path="/signup" element={<Navigate to="/auth" replace state={{ mode: 'signup' }} />} />
+        <Route path="/login" element={<Navigate to="/auth" replace />} />
 
         {/* Store Setup Builder */}
         <Route

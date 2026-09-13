@@ -53,7 +53,7 @@ export const StorefrontPage: React.FC = () => {
             </Link>
           ) : (
             <Link
-              to="/"
+              to="/auth"
               className="px-4 py-2 rounded-lg bg-[#09090b] text-white text-xs font-semibold hover:bg-[#27272a] transition-colors shadow-xs"
             >
               Sign In to Genbytez
